@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101a2e">
+  <title>Timeline Progress | Erafone Barombong</title>
+  <link rel="icon" type="image/png" href="./assets/logo-mata-utama.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="./css/style.css">
+  <script src="./js/theme-init.js"></script>
+</head>
+<body class="min-h-screen bg-slate-100 text-slate-800 dark:bg-slate-950 dark:text-slate-100">
+  <header class="no-print sticky top-0 z-40 border-b border-slate-800 bg-slate-950 text-white shadow-lg">
+    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
+      <div class="flex min-w-0 items-center gap-3">
+        <img src="./assets/logo-mata-utama.png" alt="Logo Mata Utama" class="h-11 w-11 rounded-xl bg-white object-contain p-1">
+        <div class="min-w-0">
+          <h1 class="text-base font-extrabold tracking-tight sm:text-xl"><span class="text-cyan-300">Timeline Progress</span> <span class="text-rose-400">/ Milestone Log</span></h1>
+          <p class="text-[10px] leading-relaxed text-slate-300 sm:text-xs">Catatan harian atau daily update dari mandor/supervisor</p>
+          <p class="text-[10px] font-semibold text-slate-200 sm:text-xs">New Store Erafone - Barombong - Sulawesi Selatan</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="hidden rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-[11px] font-bold text-emerald-300 sm:inline-flex sm:items-center sm:gap-2"><span class="h-2 w-2 rounded-full bg-emerald-400"></span>Live Tracking Active</span>
+        <button type="button" onclick="toggleTheme()" class="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm hover:bg-slate-700" aria-label="Ganti tema">◐</button>
+        <button type="button" onclick="window.print()" class="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-bold hover:bg-slate-700">▣ Cetak Report</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto flex w-full max-w-7xl flex-col gap-5 px-4 py-5 sm:px-6 sm:py-7">
+    <div id="mode-banner" class="hidden"></div>
+
+    <section class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <article class="glass-card rounded-2xl p-5">
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Progress keseluruhan</p>
+        <div class="mt-2 flex items-end justify-between gap-3"><strong id="stat-progress" class="text-3xl font-extrabold text-blue-600 dark:text-blue-400">0,0%</strong><span class="text-xs text-slate-500">dari target 100%</span></div>
+        <div class="mt-4 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700"><div id="overall-progress-bar" class="progress-transition h-full rounded-full bg-blue-600" style="width:0%"></div></div>
+      </article>
+      <article class="glass-card rounded-2xl p-5">
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Task selesai</p>
+        <div class="mt-2 flex items-end justify-between"><strong id="stat-completed-count" class="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">0</strong><span class="text-xs text-slate-500">item tercentang</span></div>
+        <p class="mt-4 text-xs text-slate-500 dark:text-slate-400">Task selesai wajib memiliki minimal satu foto bukti.</p>
+      </article>
+      <article class="glass-card rounded-2xl p-5">
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Sisa pekerjaan</p>
+        <div class="mt-2 flex items-end justify-between"><strong id="stat-remaining" class="text-3xl font-extrabold text-rose-500">0 Task</strong><span class="text-xs text-slate-500">belum selesai</span></div>
+        <p class="mt-4 text-xs text-slate-500 dark:text-slate-400">Perbarui progres dan bukti foto sesuai kondisi lapangan.</p>
+      </article>
+    </section>
+
+    <section class="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(300px,1fr)]">
+      <article class="glass-card min-w-0 rounded-2xl p-5">
+        <div class="mb-4 flex flex-wrap items-start justify-between gap-2"><div><h2 class="font-extrabold">Kurva-S Progress</h2><p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Perbandingan target rencana dan realisasi aktual</p></div><div class="flex flex-wrap gap-3 text-[11px]"><span class="flex items-center gap-2"><i class="h-2 w-5 rounded bg-blue-500"></i>Target rencana</span><span class="flex items-center gap-2"><i class="h-2 w-5 rounded bg-emerald-500"></i>Realisasi live</span></div></div>
+        <div class="relative h-64 sm:h-72"><canvas id="scurveChart" aria-label="Grafik Kurva-S progress"></canvas></div>
+      </article>
+      <article class="glass-card rounded-2xl p-5">
+        <h2 class="font-extrabold">Progress per Kategori</h2><p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Bobot pekerjaan yang sudah selesai</p>
+        <div class="mt-5 space-y-4">
+          <div><div class="mb-1 flex justify-between text-xs"><span class="font-bold">MEP</span><span id="cat-val-MEP">0,0%</span></div><div class="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700"><div id="cat-bar-MEP" class="progress-transition h-full rounded-full bg-cyan-500" style="width:0%"></div></div></div>
+          <div><div class="mb-1 flex justify-between text-xs"><span class="font-bold">SIPIL</span><span id="cat-val-SIPIL">0,0%</span></div><div class="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700"><div id="cat-bar-SIPIL" class="progress-transition h-full rounded-full bg-blue-500" style="width:0%"></div></div></div>
+          <div><div class="mb-1 flex justify-between text-xs"><span class="font-bold">FURNITURE</span><span id="cat-val-FURNITURE">0,0%</span></div><div class="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700"><div id="cat-bar-FURNITURE" class="progress-transition h-full rounded-full bg-amber-500" style="width:0%"></div></div></div>
+          <div><div class="mb-1 flex justify-between text-xs"><span class="font-bold">STRUKTUR</span><span id="cat-val-STRUKTUR">0,0%</span></div><div class="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700"><div id="cat-bar-STRUKTUR" class="progress-transition h-full rounded-full bg-violet-500" style="width:0%"></div></div></div>
+          <div><div class="mb-1 flex justify-between text-xs"><span class="font-bold">BRANDING</span><span id="cat-val-BRANDING">0,0%</span></div><div class="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700"><div id="cat-bar-BRANDING" class="progress-transition h-full rounded-full bg-rose-500" style="width:0%"></div></div></div>
+          <div><div class="mb-1 flex justify-between text-xs"><span class="font-bold">HVAC</span><span id="cat-val-HVAC">0,0%</span></div><div class="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700"><div id="cat-bar-HVAC" class="progress-transition h-full rounded-full bg-emerald-500" style="width:0%"></div></div></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="glass-card overflow-hidden rounded-2xl">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 p-5 dark:border-slate-700">
+        <div><h2 class="font-extrabold">Checklist Pekerjaan & Bukti Foto</h2><p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Centang item setelah mengunggah foto bukti pekerjaan.</p></div>
+        <div id="weekFilter" class="flex max-w-full flex-wrap gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
+          <button class="week-btn active" onclick="filterWeek('all', this)">Semua</button><button class="week-btn" onclick="filterWeek('W1', this)">Minggu 1</button><button class="week-btn" onclick="filterWeek('W2', this)">Minggu 2</button><button class="week-btn" onclick="filterWeek('W3', this)">Minggu 3</button><button class="week-btn" onclick="filterWeek('W4', this)">Minggu 4</button>
+        </div>
+      </div>
+      <div class="thin-scroll overflow-x-auto">
+        <table class="w-full min-w-[1050px] border-collapse text-left text-xs">
+          <thead class="bg-slate-50 text-[10px] uppercase tracking-wide text-slate-500 dark:bg-slate-800/80 dark:text-slate-300"><tr>
+            <th class="px-4 py-3 text-center">Done</th><th class="px-4 py-3">No. / Minggu</th><th class="px-4 py-3">Uraian Pekerjaan</th><th class="px-4 py-3 text-center">Kategori</th><th class="px-4 py-3 text-center">Jadwal</th><th class="px-4 py-3 text-right">Bobot</th><th class="px-4 py-3 text-right">Volume</th><th class="px-4 py-3">Satuan</th><th class="px-4 py-3">Catatan / Keterangan</th><th class="px-4 py-3">Bukti Foto</th>
+          </tr></thead>
+          <tbody id="checklistTableBody" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="signature-block glass-card rounded-2xl p-5">
+      <h2 class="border-b border-slate-200 pb-3 text-[11px] font-extrabold uppercase tracking-wide dark:border-slate-700">Lembar Pengesahan Inspeksi Field Supervisi</h2>
+      <div class="grid grid-cols-3 gap-4 pt-4 text-center text-[11px]">
+        <div><p>Disiapkan Oleh:</p><div class="signature-col flex h-28 items-end justify-center pb-2 font-semibold">(................................)</div><p class="text-[10px] text-slate-500">Pelaksana / Supervisor</p></div>
+        <div><p>Diperiksa Oleh:</p><div class="signature-col flex h-28 items-end justify-center pb-2 font-semibold">(................................)</div><p class="text-[10px] text-slate-500">Vendor / Kontraktor Utama</p></div>
+        <div><p>Disetujui Oleh:</p><div class="signature-col flex h-28 items-end justify-center pb-2 font-semibold">(................................)</div><p class="text-[10px] text-slate-500">Project / OE Erajaya Group</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="no-print mt-4 bg-slate-950 text-slate-200">
+    <div class="mx-auto flex max-w-7xl flex-col justify-between gap-3 px-4 py-5 text-[10px] sm:flex-row sm:items-center sm:px-6"><div><p class="font-semibold">Supervisi Fit-Out Store - Erajaya Group</p><p class="text-slate-400">Project New Store Erafone Barombong, Sulawesi Selatan</p></div><div class="sm:text-right"><p>Generated for Field Supervisor & Operation Excellence</p><p class="font-bold text-sky-400">Designed by @djiduth_ID</p></div></div>
+  </footer>
+
+  <div id="lightbox" role="dialog" aria-modal="true" aria-label="Pratinjau foto bukti" onclick="if(event.target===this)closeLightbox()">
+    <div class="mb-3 flex w-full max-w-5xl items-center justify-between gap-3 text-white"><p id="lb-caption" class="text-sm font-semibold"></p><button type="button" onclick="closeLightbox()" class="rounded-lg bg-white/10 px-3 py-2 text-sm">Tutup ✕</button></div>
+    <div class="flex w-full max-w-5xl items-center justify-center gap-3"><button id="lb-prev" class="lb-nav" type="button" onclick="stepLightbox(-1)" aria-label="Foto sebelumnya">‹</button><img id="lb-img" src="" alt="Foto bukti pekerjaan"><button id="lb-next" class="lb-nav" type="button" onclick="stepLightbox(1)" aria-label="Foto berikutnya">›</button></div>
+    <button type="button" onclick="deleteCurrentPhoto()" class="mt-4 rounded-lg bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-500">Hapus foto</button>
+  </div>
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/data.js"></script>
+  <script src="./js/storage.js"></script>
+  <script src="./js/app.js"></script>
+  <script>
+    // Sinkronkan bar progres utama setelah metrik dihitung oleh app.js.
+    const progressObserver = new MutationObserver(() => {
+      const value = document.getElementById('stat-progress').textContent.replace('%','').replace(',','.');
+      const bar = document.getElementById('overall-progress-bar');
+      if (bar && Number.isFinite(Number(value))) bar.style.width = Math.max(0,Math.min(100,Number(value))) + '%';
+    });
+    progressObserver.observe(document.getElementById('stat-progress'), { childList:true, characterData:true, subtree:true });
+  </script>
+</body>
+</html>
